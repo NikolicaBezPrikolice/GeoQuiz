@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -47,7 +48,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    FrontPage(name = "Geo Quiz")
+                    //FrontPage(name = "Geo Quiz")
+                    Game()
                 }
             }
         }
@@ -155,6 +157,7 @@ fun Game(modifier: Modifier = Modifier) {
             contentDescription = null,
             modifier = Modifier
                 .size(250.dp)
+                .clip(MaterialTheme.shapes.small)
                 .clickable {
                     flag1 = (1..4).random()
                     var flag2Candidate: Int
