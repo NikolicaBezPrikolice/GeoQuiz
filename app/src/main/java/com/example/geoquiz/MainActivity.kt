@@ -37,6 +37,7 @@ import com.example.geoquiz.ui.GeoQuizViewModel
 import com.example.geoquiz.ui.MainMenu
 import com.example.geoquiz.ui.theme.GeoQuizTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.geoquiz.ui.flagGame
 
 
 class MainActivity : ComponentActivity() {
@@ -62,7 +63,8 @@ class MainActivity : ComponentActivity() {
 fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel()) {
     val geqQuizUiState by viewModel.uiState.collectAsState()
     Scaffold(topBar = { GeoQuizTopAppBar() }) {
-        MainMenu(nicknameInput = viewModel.nicknameInput , onNickNameInputChanged = {viewModel.updateNicknameInput(it)} )
+        //MainMenu(nicknameInput = viewModel.nicknameInput , onNickNameInputChanged = {viewModel.updateNicknameInput(it)} )
+        flagGame()
     }
 }
 
@@ -89,60 +91,6 @@ fun GeoQuizTopAppBar(modifier: Modifier = Modifier) {
     )
 }
 
-
-@Composable
-fun Game(modifier: Modifier = Modifier) {
-    var flag1 by remember { mutableStateOf((1..4).random()) }
-    var flag2 by remember {
-        mutableStateOf((1..4).random().takeIf { it != flag1 } ?: (1..4).random())
-    }
-
-    val image1 = when (flag1) {
-        1 -> R.drawable.flag_of_serbia_svg
-        2 -> R.drawable.flag_of_armenia
-        3 -> R.drawable.flag_of_ethiopia
-        else -> R.drawable.mexico
-    }
-    val image2 = when (flag2) {
-        1 -> R.drawable.flag_of_serbia_svg
-        2 -> R.drawable.flag_of_armenia
-        3 -> R.drawable.flag_of_ethiopia
-        else -> R.drawable.mexico
-    }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize(),
-    ) {
-        Image(painterResource(id = image1),
-            contentDescription = null,
-            modifier = Modifier
-                .size(250.dp)
-                .clip(MaterialTheme.shapes.small)
-                .clickable {
-                    flag1 = (1..4).random()
-                    var flag2Candidate: Int
-                    do {
-                        flag2Candidate = (1..4).random()
-                    } while (flag2Candidate == flag1)
-                    flag2 = flag2Candidate
-                })
-        Spacer(modifier = Modifier.height(16.dp))
-        Image(painter = painterResource(id = image2),
-            contentDescription = null,
-            modifier = Modifier
-                .size(250.dp)
-                .clickable {
-                    flag1 = (1..4).random()
-                    var flag2Candidate: Int
-                    do {
-                        flag2Candidate = (1..4).random()
-                    } while (flag2Candidate == flag1)
-                    flag2 = flag2Candidate
-                }
-        )
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
