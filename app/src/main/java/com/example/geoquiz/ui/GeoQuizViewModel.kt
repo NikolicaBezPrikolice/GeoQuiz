@@ -32,9 +32,6 @@ class GeoQuizViewModel : ViewModel() {
         resetGame()
     }
 
-    /*
-     * Re-initializes the game data to restart the game.
-     */
     fun resetGame() {
         usedCountries.clear()
         val newCountry = pickRandomCountry()
