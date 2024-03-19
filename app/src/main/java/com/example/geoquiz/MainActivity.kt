@@ -26,6 +26,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +43,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.geoquiz.ui.GeoQuizViewModel
+import com.example.geoquiz.ui.MainMenu
 import com.example.geoquiz.ui.theme.GeoQuizTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -65,9 +69,10 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun GeoQuizApp() {
+fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel()) {
+    val geqQuizUiState by viewModel.uiState.collectAsState()
     Scaffold(topBar = { GeoQuizTopAppBar() }) {
-        FrontPage(name = "Geo quiz")
+        MainMenu(nicknameInput = viewModel.nicknameInput , onNickNameInputChanged = {viewModel.updateNicknameInput(it)} )
     }
 }
 
@@ -94,67 +99,6 @@ fun GeoQuizTopAppBar(modifier: Modifier = Modifier) {
     )
 }
 
-@Composable
-fun FrontPage(name: String, modifier: Modifier = Modifier) {
-    var nickNameInput by rememberSaveable { mutableStateOf("") }
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        // Background image
-        Image(
-            painter = painterResource(id = R.drawable.adc62a35c875858dcce4b600ffee2cea),
-            contentDescription = null,
-            alpha = 0.5F,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxHeight()
-        ) {
-            TextField(
-                value = nickNameInput,
-                onValueChange = { nickNameInput = it },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Default
-                ),
-                label = { Text("Nickname") },
-                modifier = modifier
-            )
-            Spacer(modifier = Modifier.padding(20.dp))
-            Button(
-                onClick = {
-                    // Start new game logic
-                },
-                enabled = nickNameInput.isNotBlank()
-            ) {
-                Text(text = "Start new game")
-            }
-            Spacer(modifier = Modifier.padding(20.dp))
-            Button(onClick = { /*TODO*/ }) {
-                Text(text = "High scores")
-            }
-        }
-        Column(
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Text(
-                text = "© 2024 Nikola Tabaš",
-                modifier = Modifier.padding(
-                    bottom = 16.dp, end = 16.dp
-                )
-            )
-
-        }
-    }
-}
 
 @Composable
 fun Game(modifier: Modifier = Modifier) {
@@ -214,6 +158,6 @@ fun Game(modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     GeoQuizTheme {
-        FrontPage("Geo QUiz")
+
     }
 }
