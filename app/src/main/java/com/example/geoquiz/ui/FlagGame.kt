@@ -76,6 +76,7 @@ fun FlagGame(
     }
 }
 
+
 @Composable
 private fun FinalScoreDialog(
     score: Int,

@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.geoquiz.ui.GeoQuizViewModel
 import com.example.geoquiz.ui.theme.GeoQuizTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.geoquiz.ui.ConnectGame
 import com.example.geoquiz.ui.FlagGame
 
 
@@ -53,7 +54,8 @@ fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel()) {
     val geqQuizUiState by viewModel.uiState.collectAsState()
     Scaffold(topBar = { GeoQuizTopAppBar() }) {
         //MainMenu(nicknameInput = viewModel.nicknameInput , onNickNameInputChanged = {viewModel.updateNicknameInput(it)} )
-        FlagGame()
+        //FlagGame()
+        ConnectGame()
     }
 }
 

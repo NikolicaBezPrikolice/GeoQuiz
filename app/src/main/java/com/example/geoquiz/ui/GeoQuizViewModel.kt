@@ -1,5 +1,6 @@
 package com.example.geoquiz.ui
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,12 +25,17 @@ class GeoQuizViewModel : ViewModel() {
     private var usedCountries: MutableSet<Country> = mutableSetOf()
     var flags: MutableList<Int> = mutableListOf()
     val flagIds: List<Int> by lazy { getRandomFlags() }
+    var countries: MutableList<String> = mutableListOf()
+    var capitals: MutableList<String> = mutableListOf()
+    val clickedButtonIndex: MutableMap<Int, Boolean> = mutableMapOf()
     fun updateNicknameInput(input: String) {
         nicknameInput = input
     }
 
     init {
+        initializeMap()
         resetGame()
+        getRandomCountriesAndCapitals()
     }
 
     fun resetGame() {
@@ -66,6 +72,7 @@ class GeoQuizViewModel : ViewModel() {
     }
 
     fun checkImageClicked(clickedFlagId: Int) {
+
         if (clickedFlagId == countryList[getCountryIndex()].flagId) {
             val updatedScore = _uiState.value.score.plus(SCORE_INCREASE)
             updateGameState(updatedScore)
@@ -98,5 +105,57 @@ class GeoQuizViewModel : ViewModel() {
         flags.shuffle()
         return flags
     }
+
+    fun getRandomCountriesAndCapitals() {
+        countries.clear()
+        capitals.clear()
+        for (i in 0 until 2) {
+            currentCountry = pickRandomCountry()
+            countries.add(currentCountry.name)
+            capitals.add(currentCountry.capital)
+        }
+    }
+
+    fun checkCapitalClicked(capital: String, button: Int) {
+        currentCountry = countryList.find { it.name == countries[uiState.value.countryCount] }!!
+        if (capital == currentCountry.capital) {
+            val updatedScore = _uiState.value.score.plus(SCORE_INCREASE)
+            clickedButtonIndex[button] = true
+            clickedButtonIndex[uiState.value.countryCount] = true
+            updateConnectGameState(updatedScore)
+        } else {
+            val updatedScore = _uiState.value.score.plus(2)
+            updateConnectGameState(updatedScore)
+        }
+
+    }
+
+    fun updateConnectGameState(updatedScore: Int) {
+        if (_uiState.value.countryCount == MAX_NO_OF_COUNTRIES - 1) {
+            //Last round in the game, update isGameOver to true, don't pick a new word
+            _uiState.update { currentState ->
+                currentState.copy(
+                    countryCount = currentState.countryCount.inc(),
+                    score = updatedScore,
+                    isGameOver = true,
+                )
+            }
+        } else {
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    countryCount = currentState.countryCount.inc(),
+                    score = updatedScore
+                )
+            }
+        }
+    }
+
+    fun initializeMap() {
+        for (i in 0 until 4) {
+            clickedButtonIndex[i] = false
+        }
+    }
+
 
 }
