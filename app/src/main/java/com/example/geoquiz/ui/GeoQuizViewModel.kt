@@ -43,13 +43,13 @@ class GeoQuizViewModel : ViewModel() {
         _uiState.value = GeoQuizUiState(
             currentCountry = newCountry.name,
             currentCountryIndex = countryList.indexOfFirst { it == newCountry },
-            flag = countryList.first { it == newCountry }.flagId
+            flag = countryList.first { it == newCountry }.flagId,
+            isGameOver = false,
         )
     }
 
     fun updateGameState(updatedScore: Int) {
-        if (usedCountries.size == MAX_NO_OF_COUNTRIES) {
-            //Last round in the game, update isGameOver to true, don't pick a new word
+        if (usedCountries.size == 3) {
             _uiState.update { currentState ->
                 currentState.copy(
                     isGameOver = true,
@@ -61,7 +61,6 @@ class GeoQuizViewModel : ViewModel() {
             _uiState.update { currentState ->
                 currentState.copy(
                     currentCountry = newCountry.name,
-                    countryCount = currentState.countryCount.inc(),
                     currentCountryIndex = countryList.indexOfFirst { it == newCountry },
                     flag = countryList.first { it == newCountry }.flagId,
                     score = updatedScore
@@ -100,7 +99,7 @@ class GeoQuizViewModel : ViewModel() {
     fun getRandomFlags(): MutableList<Int> {
         flags.clear()
         flags.add(uiState.value.flag)
-        flags.add(countryList.random().flagId)
+        flags.add(countryList.filter { it.flagId!=uiState.value.flag }.random().flagId)
         flags.shuffle()
         return flags
     }
@@ -109,10 +108,12 @@ class GeoQuizViewModel : ViewModel() {
         countries.clear()
         capitals.clear()
         for (i in 0 until 2) {
-            currentCountry = pickRandomCountry()
+            currentCountry = countryList.random()
             countries.add(currentCountry.name)
             capitals.add(currentCountry.capital)
         }
+        countries.shuffle()
+        capitals.shuffle()
     }
 
     fun checkCapitalClicked(capital: String, button: Int) {
@@ -131,7 +132,6 @@ class GeoQuizViewModel : ViewModel() {
 
     fun updateConnectGameState(updatedScore: Int) {
         if (_uiState.value.countryCount == MAX_NO_OF_COUNTRIES - 1) {
-            //Last round in the game, update isGameOver to true, don't pick a new word
             _uiState.update { currentState ->
                 currentState.copy(
                     countryCount = currentState.countryCount.inc(),
@@ -153,6 +153,14 @@ class GeoQuizViewModel : ViewModel() {
     fun initializeMap() {
         for (i in 0 until 4) {
             clickedButtonIndex[i] = false
+        }
+    }
+
+    fun updateScore(score: Int) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                score = score,
+            )
         }
     }
 

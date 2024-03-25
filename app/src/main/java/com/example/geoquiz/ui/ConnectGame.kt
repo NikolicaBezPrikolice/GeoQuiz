@@ -21,7 +21,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun ConnectGame(
+    score: Int,
     modifier: Modifier = Modifier,
+    onConfirmButtonClicked: (Int) -> Unit,
     viewModel: GeoQuizViewModel = viewModel()
 ) {
 
@@ -83,7 +85,8 @@ fun ConnectGame(
     }
     if (connectGameUiState.isGameOver) {
         FinalScoreDialog(
-            score = connectGameUiState.score,
+            score = score+connectGameUiState.score,
+            onConfirmButtonClicked = onConfirmButtonClicked
         )
     }
 }
@@ -91,6 +94,7 @@ fun ConnectGame(
 @Composable
 private fun FinalScoreDialog(
     score: Int,
+    onConfirmButtonClicked: (Int)->(Unit),
     modifier: Modifier = Modifier
 ) {
 
@@ -100,21 +104,12 @@ private fun FinalScoreDialog(
             // button. If you want to disable that functionality, simply use an empty
             // onCloseRequest.
         },
-        title = { Text(text = "congratulations") },
+        title = { Text(text = "Connect game score:") },
         text = { Text(text = score.toString()) },
         modifier = modifier,
-        dismissButton = {
-            TextButton(
-                onClick = {
-
-                }
-            ) {
-                Text(text = "exit")
-            }
-        },
         confirmButton = {
-            TextButton(onClick = {}) {
-                Text(text = "play_again")
+            TextButton(onClick = {onConfirmButtonClicked(score)}) {
+                Text(text = "next game")
             }
         }
     )

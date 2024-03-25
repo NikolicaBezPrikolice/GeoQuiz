@@ -26,6 +26,7 @@ import com.example.geoquiz.R
 fun MainMenu(
     nicknameInput: String,
     onNickNameInputChanged:(String)->Unit,
+    onStartButtonClicked: (String) -> Unit,
     modifier: Modifier = Modifier) {
 
     Box(
@@ -59,7 +60,7 @@ fun MainMenu(
             Spacer(modifier = Modifier.padding(20.dp))
             Button(
                 onClick = {
-                    // Start new game logic
+                   onStartButtonClicked(nicknameInput)
                 },
                 enabled = nicknameInput.isNotBlank()
             ) {

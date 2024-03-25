@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun FlagGame(
+    onConfirmButtonClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GeoQuizViewModel = viewModel(),
 ) {
@@ -72,6 +73,7 @@ fun FlagGame(
     if (flagGameUiState.isGameOver) {
         FinalScoreDialog(
             score = flagGameUiState.score,
+            onConfirmButtonClicked = onConfirmButtonClicked
         )
     }
 }
@@ -80,6 +82,7 @@ fun FlagGame(
 @Composable
 private fun FinalScoreDialog(
     score: Int,
+    onConfirmButtonClicked: (Int)->(Unit),
     modifier: Modifier = Modifier
 ) {
 
@@ -92,18 +95,9 @@ private fun FinalScoreDialog(
         title = { Text(text = "congratulations") },
         text = { Text(text = score.toString()) },
         modifier = modifier,
-        dismissButton = {
-            TextButton(
-                onClick = {
-
-                }
-            ) {
-                Text(text = "exit")
-            }
-        },
         confirmButton = {
-            TextButton(onClick = {}) {
-                Text(text = "play_again")
+            TextButton(onClick = {onConfirmButtonClicked(score)}) {
+                Text(text = "end game")
             }
         }
     )

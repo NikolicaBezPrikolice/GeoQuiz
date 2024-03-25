@@ -28,6 +28,7 @@ import com.example.geoquiz.ui.theme.GeoQuizTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.geoquiz.ui.ConnectGame
 import com.example.geoquiz.ui.FlagGame
+import com.example.geoquiz.ui.GeoQuizApp
 
 
 class MainActivity : ComponentActivity() {
@@ -41,52 +42,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     GeoQuizApp()
-                    //Game()
                 }
             }
         }
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel()) {
-    val geqQuizUiState by viewModel.uiState.collectAsState()
-    Scaffold(topBar = { GeoQuizTopAppBar() }) {
-        //MainMenu(nicknameInput = viewModel.nicknameInput , onNickNameInputChanged = {viewModel.updateNicknameInput(it)} )
-        //FlagGame()
-        ConnectGame()
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun GeoQuizTopAppBar(modifier: Modifier = Modifier) {
-    CenterAlignedTopAppBar(
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(dimensionResource(id = R.dimen.image_size))
-                        .padding(dimensionResource(id = R.dimen.padding_small))
-                )
-                Text(
-                    text = "GeoQuiz",
-                    style = MaterialTheme.typography.displayLarge
-                )
-            }
-        },
-        modifier = modifier
-    )
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GeoQuizTheme {
-
-    }
-}
