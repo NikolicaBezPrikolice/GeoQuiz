@@ -1,5 +1,6 @@
 package com.example.geoquiz.ui
 
+import android.provider.ContactsContract.CommonDataKinds.Nickname
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun FlagGame(
+    name:String,
     onConfirmButtonClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GeoQuizViewModel = viewModel(),
@@ -72,6 +74,7 @@ fun FlagGame(
     }
     if (flagGameUiState.isGameOver) {
         FinalScoreDialog(
+            nickname=name,
             score = flagGameUiState.score,
             onConfirmButtonClicked = onConfirmButtonClicked
         )
@@ -81,6 +84,7 @@ fun FlagGame(
 
 @Composable
 private fun FinalScoreDialog(
+    nickname: String,
     score: Int,
     onConfirmButtonClicked: (Int)->(Unit),
     modifier: Modifier = Modifier
@@ -92,7 +96,7 @@ private fun FinalScoreDialog(
             // button. If you want to disable that functionality, simply use an empty
             // onCloseRequest.
         },
-        title = { Text(text = "congratulations") },
+        title = { Text(text = nickname) },
         text = { Text(text = score.toString()) },
         modifier = modifier,
         confirmButton = {

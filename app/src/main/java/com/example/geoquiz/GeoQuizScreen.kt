@@ -57,15 +57,16 @@ fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(),
                 MainMenu(
                     nicknameInput = viewModel.nicknameInput,
                     onNickNameInputChanged = {viewModel.updateNicknameInput(it)},
-                    onStartButtonClicked = {navController.navigate(GeoQuizScreen.Flags.name)}
+                    onStartButtonClicked = {
+                        navController.navigate(GeoQuizScreen.Flags.name)}
                     )
             }
             composable(route=GeoQuizScreen.Connect.name){
-                ConnectGame(score = uiState.score, onConfirmButtonClicked = {
+                ConnectGame(score = uiState.score,name=viewModel.nicknameInput, onConfirmButtonClicked = {
                     navController.navigate(GeoQuizScreen.Menu.name)})
             }
             composable(route=GeoQuizScreen.Flags.name){
-                FlagGame(onConfirmButtonClicked = {
+                FlagGame(name=viewModel.nicknameInput,onConfirmButtonClicked = {
                         score ->
                     // Update the total score when navigating to the next game
                     viewModel.updateScore(score)
