@@ -1,6 +1,5 @@
 package com.example.geoquiz.ui
 
-import android.provider.ContactsContract.CommonDataKinds.Nickname
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
