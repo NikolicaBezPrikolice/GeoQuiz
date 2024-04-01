@@ -24,7 +24,7 @@ fun ConnectGame(
     score: Int,
     modifier: Modifier = Modifier,
     onConfirmButtonClicked: (Int) -> Unit,
-    viewModel: GeoQuizViewModel = viewModel()
+    viewModel: GeoQuizViewModel = viewModel(factory = GeoQuizViewModel.Factory)
 ) {
 
     val connectGameUiState by viewModel.uiState.collectAsState()

@@ -1,19 +1,34 @@
 package com.example.geoquiz.ui
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.geoquiz.GeoQuizApplication
 import com.example.geoquiz.data.DataSource.countryList
+import com.example.geoquiz.data.GeoQuizRepository
 import com.example.geoquiz.data.MAX_NO_OF_COUNTRIES
+import com.example.geoquiz.data.NetworkGeoQuizRepository
 import com.example.geoquiz.data.SCORE_INCREASE
 import com.example.geoquiz.model.Country
+import com.example.geoquiz.model.Country1
+import com.example.geoquiz.model.MarsPhoto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class GeoQuizViewModel : ViewModel() {
+class GeoQuizViewModel(private val geoQuizRepository: GeoQuizRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(GeoQuizUiState())
     val uiState: StateFlow<GeoQuizUiState> = _uiState.asStateFlow()
 
@@ -30,11 +45,48 @@ class GeoQuizViewModel : ViewModel() {
     fun updateNicknameInput(input: String) {
         nicknameInput = input
     }
+    private val _countryData = MutableLiveData<Country1>()
+    val countryData: LiveData<Country1> = _countryData
 
+    fun getCountryData() {
+        viewModelScope.launch {
+            try {
+                val country = geoQuizRepository.getCountryName()
+                _uiState.value=(GeoQuizUiState(population = country[0].population))
+            } catch (e: Exception) {
+                // Handle the error, e.g., show an error message
+                Log.e(TAG, "Error getting country data", e)
+            }
+        }
+    }
     init {
-        initializeMap()
-        resetGame()
-        getRandomCountriesAndCapitals()
+        //initializeMap()
+        //resetGame()
+        //getRandomCountriesAndCapitals()
+        getCountryData()
+    }
+
+
+    private fun getCountryNameById() {
+        viewModelScope.launch {
+            try {
+                val result = geoQuizRepository.getCountryName()
+                _uiState.value = GeoQuizUiState(population = result[0].population)
+            } catch (e: Exception) {
+                // Handle the error, e.g., log it or show a toast
+                Log.e(TAG, "Error fetching country name", e)
+            }
+        }
+    }
+
+    companion object{
+        val Factory: ViewModelProvider.Factory=viewModelFactory{
+            initializer {
+                val application=(this[APPLICATION_KEY] as GeoQuizApplication)
+                val geoQuizRepository=application.container.geoQuizRepository
+                GeoQuizViewModel(geoQuizRepository=geoQuizRepository)
+            }
+        }
     }
 
     fun resetGame() {

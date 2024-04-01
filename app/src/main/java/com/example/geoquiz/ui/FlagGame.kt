@@ -30,7 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun FlagGame(
     onConfirmButtonClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GeoQuizViewModel = viewModel(),
+    viewModel: GeoQuizViewModel = viewModel(factory = GeoQuizViewModel.Factory),
 ) {
     val flagGameUiState by viewModel.uiState.collectAsState()
 

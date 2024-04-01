@@ -25,6 +25,7 @@ import com.example.geoquiz.R
 @Composable
 fun MainMenu(
     nicknameInput: String,
+    countryProba: Long,
     onNickNameInputChanged:(String)->Unit,
     onStartButtonClicked: (String) -> Unit,
     modifier: Modifier = Modifier) {
@@ -68,7 +69,7 @@ fun MainMenu(
             }
             Spacer(modifier = Modifier.padding(20.dp))
             Button(onClick = { /*TODO*/ }) {
-                Text(text = "High scores")
+                Text(text = countryProba.toString())
             }
         }
         Column(

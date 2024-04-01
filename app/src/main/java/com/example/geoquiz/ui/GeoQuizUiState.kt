@@ -10,4 +10,5 @@ data class GeoQuizUiState(
     val isGameOver: Boolean = false,
     val countryCount: Int = 0,
     val score: Int = 0,
+    val population: Long=0
 )

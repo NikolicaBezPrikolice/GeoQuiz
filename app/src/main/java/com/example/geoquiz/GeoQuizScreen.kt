@@ -42,7 +42,7 @@ enum class GeoQuizScreen(@StringRes val title: Int){
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(),
+fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(factory = GeoQuizViewModel.Factory),
                navController: NavHostController = rememberNavController()
                ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -56,6 +56,7 @@ fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(),
             composable(route=GeoQuizScreen.Menu.name){
                 MainMenu(
                     nicknameInput = viewModel.nicknameInput,
+                    countryProba = uiState.population,
                     onNickNameInputChanged = {viewModel.updateNicknameInput(it)},
                     onStartButtonClicked = {navController.navigate(GeoQuizScreen.Flags.name)}
                     )
