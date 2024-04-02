@@ -27,6 +27,7 @@ fun MainMenu(
     nicknameInput: String,
     onNickNameInputChanged:(String)->Unit,
     onStartButtonClicked: (String) -> Unit,
+    onHighScoresButtonClicked: ()->Unit,
     modifier: Modifier = Modifier) {
 
     Box(
@@ -67,7 +68,7 @@ fun MainMenu(
                 Text(text = "Start new game")
             }
             Spacer(modifier = Modifier.padding(20.dp))
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = { onHighScoresButtonClicked() }) {
                 Text(text = "High scores")
             }
         }

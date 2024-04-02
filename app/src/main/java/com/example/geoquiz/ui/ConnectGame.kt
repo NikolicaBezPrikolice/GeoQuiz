@@ -1,5 +1,6 @@
 package com.example.geoquiz.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,22 +15,26 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ConnectGame(
     score: Int,
     name: String,
     modifier: Modifier = Modifier,
     onConfirmButtonClicked: (Int) -> Unit,
-    viewModel: GeoQuizViewModel = viewModel()
+    viewModel: GeoQuizViewModel = viewModel(),
+    highScoreViewModel: HighScoreViewModel= viewModel(factory = HighScoreViewModel.Factory)
 ) {
 
     val connectGameUiState by viewModel.uiState.collectAsState()
-
+    val coroutineScope= rememberCoroutineScope()
     Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.Center) {
         Column(
             modifier = Modifier
@@ -88,7 +93,12 @@ fun ConnectGame(
         FinalScoreDialog(
             score = score+connectGameUiState.score,
             nickname = name,
-            onConfirmButtonClicked = onConfirmButtonClicked
+            onConfirmButtonClicked ={
+            onConfirmButtonClicked.invoke(score + connectGameUiState.score)
+                coroutineScope.launch {
+                    highScoreViewModel.saveHighScore(name, score + connectGameUiState.score)
+                }
+    }
         )
     }
 }
@@ -100,7 +110,6 @@ private fun FinalScoreDialog(
     onConfirmButtonClicked: (Int)->(Unit),
     modifier: Modifier = Modifier
 ) {
-
     AlertDialog(
         onDismissRequest = {
             // Dismiss the dialog when the user clicks outside the dialog or on the back
@@ -111,7 +120,9 @@ private fun FinalScoreDialog(
         text = { Text(text = score.toString()) },
         modifier = modifier,
         confirmButton = {
-            TextButton(onClick = {onConfirmButtonClicked(score)}) {
+            TextButton(onClick = {
+                    onConfirmButtonClicked(score)
+            }){
                 Text(text = "next game")
             }
         }

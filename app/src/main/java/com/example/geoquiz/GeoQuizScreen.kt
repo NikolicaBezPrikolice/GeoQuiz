@@ -32,23 +32,30 @@ import com.example.geoquiz.ui.FlagGame
 import com.example.geoquiz.ui.GeoQuizViewModel
 import com.example.geoquiz.ui.MainMenu
 import com.example.geoquiz.ui.theme.GeoQuizTheme
+import com.example.geoquiz.R
+import com.example.geoquiz.ui.HighScoreViewModel
+import com.example.geoquiz.ui.HighScoresList
+
 
 enum class GeoQuizScreen(@StringRes val title: Int){
-    Menu(title =R.string.app_name ),
+    Menu(title = R.string.app_name ),
     Flags(title = R.string.flag_game),
-    Connect(title = R.string.connect_game)
+    Connect(title = R.string.connect_game),
+    HighScores(title= R.string.high_scores)
 }
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(),
+               highScoreViewModel: HighScoreViewModel= viewModel(factory = HighScoreViewModel.Factory),
                navController: NavHostController = rememberNavController()
                ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen=GeoQuizScreen.valueOf(
         backStackEntry?.destination?.route ?: GeoQuizScreen.Menu.name
     )
+    val highScoreUiState by highScoreViewModel.highScoreUiState.collectAsState()
     Scaffold(topBar = { GeoQuizTopAppBar(currentScreen = currentScreen) }) {
         innerPadding->
         val uiState by viewModel.uiState.collectAsState()
@@ -58,12 +65,16 @@ fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(),
                     nicknameInput = viewModel.nicknameInput,
                     onNickNameInputChanged = {viewModel.updateNicknameInput(it)},
                     onStartButtonClicked = {
-                        navController.navigate(GeoQuizScreen.Flags.name)}
+                        navController.navigate(GeoQuizScreen.Flags.name)},
+                    onHighScoresButtonClicked = {
+                        navController.navigate(GeoQuizScreen.HighScores.name)
+                    }
                     )
             }
             composable(route=GeoQuizScreen.Connect.name){
                 ConnectGame(score = uiState.score,name=viewModel.nicknameInput, onConfirmButtonClicked = {
-                    navController.navigate(GeoQuizScreen.Menu.name)})
+                    navController.navigate(GeoQuizScreen.Menu.name)
+                })
             }
             composable(route=GeoQuizScreen.Flags.name){
                 FlagGame(name=viewModel.nicknameInput,onConfirmButtonClicked = {
@@ -72,8 +83,14 @@ fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(),
                     viewModel.updateScore(score)
                     navController.navigate(GeoQuizScreen.Connect.name)})
             }
+            composable(route=GeoQuizScreen.HighScores.name){
+                HighScoresList(highScores = highScoreUiState.highScoreList,
+                    onClickButton = { navController.navigate(GeoQuizScreen.Menu.name) }
+                    )
+            }
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,10 +122,3 @@ fun GeoQuizTopAppBar(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GeoQuizTheme {
-
-    }
-}
