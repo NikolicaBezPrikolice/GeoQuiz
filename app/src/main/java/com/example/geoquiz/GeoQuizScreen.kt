@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -31,8 +30,6 @@ import com.example.geoquiz.ui.ConnectGame
 import com.example.geoquiz.ui.FlagGame
 import com.example.geoquiz.ui.GeoQuizViewModel
 import com.example.geoquiz.ui.MainMenu
-import com.example.geoquiz.ui.theme.GeoQuizTheme
-import com.example.geoquiz.R
 import com.example.geoquiz.ui.HighScoreViewModel
 import com.example.geoquiz.ui.HighScoresList
 
