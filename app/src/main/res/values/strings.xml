@@ -11,4 +11,7 @@
     <string name="score">Score</string>
     <string name="guess_flag">Which one is the flag of</string>
     <string name="next_game">Next game</string>
+    <string name="connect_capital">Connect country with its capital</string>
+    <string name="final_score">Final score</string>
+    <string name="end_game">End game</string>
 </resources>

@@ -96,7 +96,7 @@ fun PortraitFlagLayout(
                 if (viewModel.clickedFlagId.value == flagId && flagId == DataSource.countryList[viewModel.getCountryIndex()].flagId) {
                     Color.Green
                 } else if (viewModel.clickedFlagId.value == flagId && flagId != DataSource.countryList[viewModel.getCountryIndex()].flagId) {
-                    Color.Red // No border for incorrect flags
+                    Color.Red
                 } else {
                     Color.Transparent
                 }
@@ -108,7 +108,7 @@ fun PortraitFlagLayout(
                     .clickable {
                         coroutineScope.launch {
                             viewModel.updateClickedFlagId(flagId)
-                            delay(1000)
+                            delay(500)
                             viewModel.updateClickedFlagId(null)
                             viewModel.checkImageClicked(flagId)
                         }
@@ -162,7 +162,7 @@ fun LandscapeFlagLayout(
                     if (viewModel.clickedFlagId.value == flagId && flagId == DataSource.countryList[viewModel.getCountryIndex()].flagId) {
                         Color.Green
                     } else if (viewModel.clickedFlagId.value == flagId && flagId != DataSource.countryList[viewModel.getCountryIndex()].flagId) {
-                        Color.Red // No border for incorrect flags
+                        Color.Red
                     } else {
                         Color.Transparent
                     }
@@ -174,7 +174,7 @@ fun LandscapeFlagLayout(
                         .clickable {
                             coroutineScope.launch {
                                 viewModel.updateClickedFlagId(flagId)
-                                delay(1000)
+                                delay(500)
                                 viewModel.updateClickedFlagId(null)
                                 viewModel.checkImageClicked(flagId)
                             }

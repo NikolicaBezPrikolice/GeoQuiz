@@ -3,8 +3,9 @@ package com.example.geoquiz.data
 import com.example.geoquiz.R
 import com.example.geoquiz.model.Country
 
-const val MAX_NO_OF_COUNTRIES = 2
+const val MAX_NO_OF_COUNTRIES = 5
 const val SCORE_INCREASE = 10
+const val SCORE_DECREASE = 2
 object DataSource {
     val countryList= listOf(
         Country(R.drawable.flag_of_armenia, "Armenia", "Yerevan", 5000000),

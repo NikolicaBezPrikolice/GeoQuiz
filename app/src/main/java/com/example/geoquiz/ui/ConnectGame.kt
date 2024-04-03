@@ -1,11 +1,16 @@
 package com.example.geoquiz.ui
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -19,8 +24,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import com.example.geoquiz.R
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -35,57 +45,74 @@ fun ConnectGame(
 
     val connectGameUiState by viewModel.uiState.collectAsState()
     val coroutineScope= rememberCoroutineScope()
-    Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.Center) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-        ) {
-            Button(
-                onClick = { },
-                colors = ButtonDefaults.buttonColors(if (viewModel.clickedButtonIndex[0] == true) Color.Green else if (connectGameUiState.countryCount == 0) Color.Yellow else if (viewModel.clickedButtonIndex[0] == false) Color.Red else MaterialTheme.colorScheme.primary),
-                //enabled = false,
-                modifier = Modifier.fillMaxWidth()
+    Column(
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = stringResource(id = R.string.connect_capital),
+            modifier = Modifier.padding(
+                top=70.dp,
+                start = dimensionResource(id = R.dimen.padding_small),
+                end=dimensionResource(id = R.dimen.padding_small),
+                bottom = dimensionResource(id = R.dimen.padding_medium)),
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
+        )
+        Row( horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                Text(text = viewModel.countries[0])
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                for (i in viewModel.countries.indices) {
+                    Button(
+                        onClick = { },
+                        colors = ButtonDefaults.buttonColors(
+                            when {
+                                viewModel.clickedButtonIndex[i] == true -> Color.Green
+                                connectGameUiState.countryCount == i -> Color.Yellow
+
+                                viewModel.clickedButtonIndex[i] == false && i > connectGameUiState.countryCount -> MaterialTheme.colorScheme.primary
+                                else -> Color.Red
+                            }
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(dimensionResource(id = R.dimen.padding_small))
+                    ) {
+                        Text(text = viewModel.countries[i], modifier=Modifier.padding(
+                            dimensionResource(id = R.dimen.padding_small)))
+                    }
+                }
             }
-            Button(
-                onClick = { },
-                colors = ButtonDefaults.buttonColors(if (viewModel.clickedButtonIndex[1] == true) Color.Green else if (connectGameUiState.countryCount == 1) Color.Yellow else if (viewModel.clickedButtonIndex[1] == false) Color.Red else MaterialTheme.colorScheme.primary),
-                // enabled=false,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
             ) {
-                Text(text = viewModel.countries[1])
-            }
-        }
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-        ) {
-            Button(
-                onClick = {
-                    if (viewModel.clickedButtonIndex[2] != true) viewModel.checkCapitalClicked(
-                        viewModel.capitals[0],
-                        2
-                    )
-                },
-                colors = ButtonDefaults.buttonColors(if (viewModel.clickedButtonIndex[2] == true) Color.Green else MaterialTheme.colorScheme.primary),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = viewModel.capitals[0])
-            }
-            Button(
-                onClick = {
-                    if (viewModel.clickedButtonIndex[3] != true) viewModel.checkCapitalClicked(
-                        viewModel.capitals[1],
-                        3
-                    )
-                },
-                colors = ButtonDefaults.buttonColors(if (viewModel.clickedButtonIndex[3] == true) Color.Green else MaterialTheme.colorScheme.primary),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = viewModel.capitals[1])
+                for (i in viewModel.capitals.indices) {
+                    Button(
+                        onClick = {
+                            if (viewModel.clickedButtonIndex[i + 5] != true) {
+                                viewModel.checkCapitalClicked(viewModel.capitals[i], i + 5)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            if (viewModel.clickedButtonIndex[i + 5] == true) Color.Green
+                            else MaterialTheme.colorScheme.primary
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(dimensionResource(id = R.dimen.padding_small))
+                    ) {
+                        Text(text = viewModel.capitals[i], modifier=Modifier.padding(
+                                dimensionResource(id = R.dimen.padding_small)))
+                    }
+                }
+
             }
         }
     }
@@ -112,18 +139,15 @@ private fun FinalScoreDialog(
 ) {
     AlertDialog(
         onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onCloseRequest.
         },
-        title = { Text(text = nickname) },
-        text = { Text(text = score.toString()) },
+        title = { Text(text = stringResource(id = R.string.nickname)+":  "+nickname) },
+        text = { Text(text = stringResource(id = R.string.final_score)+":  "+score.toString()) },
         modifier = modifier,
         confirmButton = {
             TextButton(onClick = {
                     onConfirmButtonClicked(score)
             }){
-                Text(text = "next game")
+                Text(text = stringResource(id = R.string.end_game))
             }
         }
     )

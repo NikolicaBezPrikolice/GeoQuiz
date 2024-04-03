@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.geoquiz.data.DataSource.countryList
 import com.example.geoquiz.data.MAX_NO_OF_COUNTRIES
+import com.example.geoquiz.data.SCORE_DECREASE
 import com.example.geoquiz.data.SCORE_INCREASE
 import com.example.geoquiz.model.Country
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +33,6 @@ class GeoQuizViewModel : ViewModel() {
     private val _clickedFlagId = mutableStateOf<Int?>(null)
     val clickedFlagId: State<Int?> = _clickedFlagId
 
-    // Add a function to update clickedFlagId
     fun updateClickedFlagId(flagId: Int?) {
         _clickedFlagId.value = flagId
     }
@@ -49,7 +49,7 @@ class GeoQuizViewModel : ViewModel() {
     fun resetGame() {
         usedFlagsCountries.clear()
         usedCapitalsCountries.clear()
-        val newCountry = pickRandomCountry(usedFlagsCountries)
+        val newCountry = pickRandomCountry(usedFlagsCountries,0)
         _uiState.value = GeoQuizUiState(
             currentCountry = newCountry.name,
             currentCountryIndex = countryList.indexOfFirst { it == newCountry },
@@ -59,7 +59,7 @@ class GeoQuizViewModel : ViewModel() {
     }
 
     fun updateGameState(updatedScore: Int) {
-        if (usedFlagsCountries.size == 5) {
+        if (usedFlagsCountries.size == MAX_NO_OF_COUNTRIES) {
             _uiState.update { currentState ->
                 currentState.copy(
                     isGameOver = true,
@@ -67,7 +67,7 @@ class GeoQuizViewModel : ViewModel() {
                 )
             }
         } else {
-            val newCountry = pickRandomCountry(usedFlagsCountries)
+            val newCountry = pickRandomCountry(usedFlagsCountries,0)
             _uiState.update { currentState ->
                 currentState.copy(
                     currentCountry = newCountry.name,
@@ -85,19 +85,30 @@ class GeoQuizViewModel : ViewModel() {
             val updatedScore = _uiState.value.score.plus(SCORE_INCREASE)
             updateGameState(updatedScore)
         } else {
-            val updatedScore = _uiState.value.score.minus(2)
+            val updatedScore = _uiState.value.score.minus(SCORE_DECREASE)
             updateGameState(updatedScore)
         }
         flags = getRandomFlags()
     }
 
-    private fun pickRandomCountry(usedCountries: MutableSet<Country>): Country {
-        currentCountry = countryList.random()
-        return if (usedCountries.contains(currentCountry)) {
-            pickRandomCountry(usedCountries)
-        } else {
-            usedCountries.add(currentCountry)
-            return currentCountry
+    private fun pickRandomCountry(usedCountries: MutableSet<Country>,game: Int): Country {
+        if(game==0) {
+            currentCountry = countryList.random()
+            return if (usedCountries.contains(currentCountry)) {
+                pickRandomCountry(usedCountries,0)
+            } else {
+                usedCountries.add(currentCountry)
+                return currentCountry
+            }
+        }
+        else{
+            val country= countryList.random()
+            return if (usedCountries.contains(country)) {
+                pickRandomCountry(usedCountries,1)
+            } else {
+                usedCountries.add(country)
+                return country
+            }
         }
     }
 
@@ -119,8 +130,8 @@ class GeoQuizViewModel : ViewModel() {
     fun getRandomCountriesAndCapitals() {
         countries.clear()
         capitals.clear()
-        for (i in 0 until 2) {
-            val country = countryList.random()
+        for (i in 0 until MAX_NO_OF_COUNTRIES) {
+            val country = pickRandomCountry(usedCapitalsCountries,1)
             countries.add(country.name)
             capitals.add(country.capital)
         }
@@ -136,7 +147,7 @@ class GeoQuizViewModel : ViewModel() {
             clickedButtonIndex[uiState.value.countryCount] = true
             updateConnectGameState(updatedScore)
         } else {
-            val updatedScore = _uiState.value.score.plus(2)
+            val updatedScore = _uiState.value.score.minus(SCORE_DECREASE)
             updateConnectGameState(updatedScore)
         }
 
@@ -163,7 +174,7 @@ class GeoQuizViewModel : ViewModel() {
     }
 
     fun initializeMap() {
-        for (i in 0 until 4) {
+        for (i in 0 until 10) {
             clickedButtonIndex[i] = false
         }
     }
