@@ -18,9 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.geoquiz.data.HighScore
-
+import com.example.geoquiz.R
 @Composable
 fun HighScoresList(highScores: List<HighScore>,
                    onClickButton: ()->(Unit)) {
@@ -31,7 +32,7 @@ fun HighScoresList(highScores: List<HighScore>,
                 .align(Alignment.End)
                 .padding(end = 16.dp, bottom = 16.dp)
         ) {
-            Text("Back to Main Menu")
+            Text(stringResource(id = R.string.back_to_main_menu))
         }
         LazyColumn(modifier = Modifier.padding(top=10.dp)) {
             item {
@@ -41,7 +42,7 @@ fun HighScoresList(highScores: List<HighScore>,
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     Text(
-                        text = "Position"
+                        text = stringResource(id = R.string.position)
                     )
                     Divider(
                         modifier = Modifier
@@ -51,7 +52,7 @@ fun HighScoresList(highScores: List<HighScore>,
                         color = Color.White
                     )
                     Text(
-                        text = "Name",
+                        text = stringResource(id = R.string.nickname),
                         modifier = Modifier.width(70.dp)
                     )
                     Divider(
@@ -62,7 +63,7 @@ fun HighScoresList(highScores: List<HighScore>,
                         color = Color.White
                     )
                     Text(
-                        text = "Score",
+                        text = stringResource(id = R.string.score),
                         modifier = Modifier.padding(end = 16.dp)
                     )
                 }
