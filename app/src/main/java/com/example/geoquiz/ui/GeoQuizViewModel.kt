@@ -3,9 +3,7 @@ package com.example.geoquiz.ui
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import com.example.geoquiz.data.DataSource.countryList
 import com.example.geoquiz.data.MAX_NO_OF_COUNTRIES
