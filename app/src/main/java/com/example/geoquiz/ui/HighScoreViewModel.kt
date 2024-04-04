@@ -1,6 +1,6 @@
 package com.example.geoquiz.ui
 
-import android.util.Log
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
