@@ -52,7 +52,7 @@ fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(),
     val currentScreen=GeoQuizScreen.valueOf(
         backStackEntry?.destination?.route ?: GeoQuizScreen.Menu.name
     )
-    val highScoreUiState by highScoreViewModel.highScoreUiState.collectAsState()
+    val highScoresUiState by highScoreViewModel.highScoresUiState.collectAsState()
     Scaffold(topBar = { GeoQuizTopAppBar(currentScreen = currentScreen) }) {
         innerPadding->
         val uiState by viewModel.uiState.collectAsState()
@@ -81,7 +81,7 @@ fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(),
                     navController.navigate(GeoQuizScreen.Connect.name)})
             }
             composable(route=GeoQuizScreen.HighScores.name){
-                HighScoresList(highScores = highScoreUiState.highScoreList,
+                HighScoresList(highScores = highScoresUiState.highScoreList,
                     onClickButton = { navController.navigate(GeoQuizScreen.Menu.name) }
                     )
             }

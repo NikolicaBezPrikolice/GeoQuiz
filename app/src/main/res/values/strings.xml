@@ -14,4 +14,8 @@
     <string name="connect_capital">Connect country with its capital</string>
     <string name="final_score">Final score</string>
     <string name="end_game">End game</string>
+    <string name="delete_scores">Delete all scores</string>
+    <string name="confirmation">Are you sure?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

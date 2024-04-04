@@ -1,6 +1,7 @@
 package com.example.geoquiz.ui
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,28 +39,32 @@ fun ConnectGame(
     modifier: Modifier = Modifier,
     onConfirmButtonClicked: (Int) -> Unit,
     viewModel: GeoQuizViewModel = viewModel(),
-    highScoreViewModel: HighScoreViewModel= viewModel(factory = HighScoreViewModel.Factory)
+    highScoreViewModel: HighScoreViewModel = viewModel(factory = HighScoreViewModel.Factory)
 ) {
 
     val connectGameUiState by viewModel.uiState.collectAsState()
-    val coroutineScope= rememberCoroutineScope()
+    val highScoreUiState by highScoreViewModel.uiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()) {
+        modifier = modifier.fillMaxSize()
+    ) {
         Text(
             text = stringResource(id = R.string.connect_capital),
             modifier = Modifier.padding(
-                top=70.dp,
+                top = 70.dp,
                 start = dimensionResource(id = R.dimen.padding_small),
-                end=dimensionResource(id = R.dimen.padding_small),
-                bottom = dimensionResource(id = R.dimen.padding_medium)),
+                end = dimensionResource(id = R.dimen.padding_small),
+                bottom = dimensionResource(id = R.dimen.padding_medium)
+            ),
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center
         )
-        Row( horizontalArrangement = Arrangement.Center,
+        Row(
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier.verticalScroll(rememberScrollState())
-            ) {
+        ) {
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -81,8 +86,11 @@ fun ConnectGame(
                             .fillMaxWidth()
                             .padding(dimensionResource(id = R.dimen.padding_small))
                     ) {
-                        Text(text = viewModel.countries[i], modifier=Modifier.padding(
-                            dimensionResource(id = R.dimen.padding_small)))
+                        Text(
+                            text = viewModel.countries[i], modifier = Modifier.padding(
+                                dimensionResource(id = R.dimen.padding_small)
+                            )
+                        )
                     }
                 }
             }
@@ -106,8 +114,11 @@ fun ConnectGame(
                             .fillMaxWidth()
                             .padding(dimensionResource(id = R.dimen.padding_small))
                     ) {
-                        Text(text = viewModel.capitals[i], modifier=Modifier.padding(
-                                dimensionResource(id = R.dimen.padding_small)))
+                        Text(
+                            text = viewModel.capitals[i], modifier = Modifier.padding(
+                                dimensionResource(id = R.dimen.padding_small)
+                            )
+                        )
                     }
                 }
 
@@ -116,14 +127,14 @@ fun ConnectGame(
     }
     if (connectGameUiState.isGameOver) {
         FinalScoreDialog(
-            score = score+connectGameUiState.score,
+            score = score + connectGameUiState.score,
             nickname = name,
-            onConfirmButtonClicked ={
-            onConfirmButtonClicked.invoke(score + connectGameUiState.score)
+            onConfirmButtonClicked = {
+                onConfirmButtonClicked.invoke(score + connectGameUiState.score)
                 coroutineScope.launch {
                     highScoreViewModel.saveHighScore(name, score + connectGameUiState.score)
                 }
-    }
+            }
         )
     }
 }
@@ -132,19 +143,19 @@ fun ConnectGame(
 private fun FinalScoreDialog(
     score: Int,
     nickname: String,
-    onConfirmButtonClicked: (Int)->(Unit),
+    onConfirmButtonClicked: (Int) -> (Unit),
     modifier: Modifier = Modifier
 ) {
     AlertDialog(
         onDismissRequest = {
         },
-        title = { Text(text = stringResource(id = R.string.nickname)+":  "+nickname) },
-        text = { Text(text = stringResource(id = R.string.final_score)+":  "+score.toString()) },
+        title = { Text(text = stringResource(id = R.string.nickname) + ":  " + nickname) },
+        text = { Text(text = stringResource(id = R.string.final_score) + ":  " + score.toString()) },
         modifier = modifier,
         confirmButton = {
             TextButton(onClick = {
-                    onConfirmButtonClicked(score)
-            }){
+                onConfirmButtonClicked(score)
+            }) {
                 Text(text = stringResource(id = R.string.end_game))
             }
         }
