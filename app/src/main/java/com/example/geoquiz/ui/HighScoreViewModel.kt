@@ -14,7 +14,6 @@ import com.example.geoquiz.data.HighScoreRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -74,4 +73,3 @@ class HighScoreViewModel(private val highScoreRepository: HighScoreRepository) :
 
 data class HighScoresUiState(val highScoreList: List<HighScore> = listOf())
 
-data class HighScoreUiState(val score: HighScore? = null)
