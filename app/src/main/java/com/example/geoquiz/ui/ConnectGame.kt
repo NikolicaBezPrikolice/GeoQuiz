@@ -1,6 +1,7 @@
 package com.example.geoquiz.ui
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import com.example.geoquiz.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -42,7 +45,7 @@ fun ConnectGame(
 ) {
 
     val connectGameUiState by viewModel.uiState.collectAsState()
-    val highScoreUiState by highScoreViewModel.uiState.collectAsState()
+    val highScoreUiState by highScoreViewModel.gotScore.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
@@ -125,13 +128,25 @@ fun ConnectGame(
         }
     }
     if (connectGameUiState.isGameOver) {
+        highScoreViewModel.getScore(name)
         FinalScoreDialog(
             score = score + connectGameUiState.score,
             nickname = name,
             onConfirmButtonClicked = {
                 onConfirmButtonClicked.invoke(score + connectGameUiState.score)
-                coroutineScope.launch {
-                    highScoreViewModel.saveHighScore(name, score + connectGameUiState.score)
+                if (highScoreUiState != null) {
+                    coroutineScope.launch {
+                        withContext(Dispatchers.IO) {
+                            highScoreViewModel.updateOneScore(
+                                highScoreUiState!!,
+                                score + connectGameUiState.score
+                            )
+                        }
+                    }
+                } else {
+                    coroutineScope.launch {
+                        highScoreViewModel.saveHighScore(name, score + connectGameUiState.score)
+                    }
                 }
             }
         )

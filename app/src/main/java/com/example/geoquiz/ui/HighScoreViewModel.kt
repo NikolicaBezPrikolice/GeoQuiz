@@ -1,6 +1,8 @@
 package com.example.geoquiz.ui
 
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -15,10 +17,24 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class HighScoreViewModel(private val highScoreRepository: HighScoreRepository):ViewModel(){
-    private val _uiState = MutableStateFlow(HighScoreUiState())
-    val uiState: StateFlow<HighScoreUiState> = _uiState.asStateFlow()
+class HighScoreViewModel(private val highScoreRepository: HighScoreRepository) : ViewModel() {
+
+    var gotScore = MutableStateFlow<HighScore?>(null)
+
+    fun getScore(name: String) {
+        viewModelScope.launch {
+            try {
+                highScoreRepository.getScoreStream(name).collect {
+                    gotScore.value = it
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting score for $name: ${e.message}")
+            }
+        }
+    }
+
     suspend fun saveHighScore(name: String, score: Int) {
         val highScore = HighScore(name = name, score = score)
         highScoreRepository.insertScore(highScore)
@@ -32,22 +48,23 @@ class HighScoreViewModel(private val highScoreRepository: HighScoreRepository):V
                 started = SharingStarted.WhileSubscribed(5_000L),
                 initialValue = HighScoresUiState()
             )
-    fun getScoreByName(name: String) =highScoreRepository.getScoreStream(name)
 
     suspend fun deleteAllItems() {
         highScoreRepository.deleteAllScores()
     }
 
-    suspend fun updateOneScore(existingScore: StateFlow<HighScoreUiState>, newScoreValue: Int) {
+    suspend fun updateOneScore(existingScore: HighScore, newScoreValue: Int) {
 
-            val updatedScore =HighScore(existingScore.value.score!!.id,existingScore.value.score!!.name,newScoreValue)
+        val updatedScore = HighScore(existingScore.id, existingScore.name, newScoreValue)
         highScoreRepository.updateScore(updatedScore)
 
     }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as GeoQuizApplication)
+                val application =
+                    (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as GeoQuizApplication)
                 val highScoreRepository = application.container.highScoreRepository
                 HighScoreViewModel(highScoreRepository = highScoreRepository)
             }
