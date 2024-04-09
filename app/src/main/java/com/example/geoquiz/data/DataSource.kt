@@ -1,7 +1,6 @@
 package com.example.geoquiz.data
 
-import com.example.geoquiz.R
-import com.example.geoquiz.model.Country
+
 
 const val MAX_NO_OF_COUNTRIES = 5
 const val SCORE_INCREASE = 10

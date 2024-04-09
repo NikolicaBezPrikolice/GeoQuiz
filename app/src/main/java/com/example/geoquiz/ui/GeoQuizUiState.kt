@@ -1,8 +1,5 @@
 package com.example.geoquiz.ui
 
-import androidx.annotation.DrawableRes
-
-
 data class GeoQuizUiState(
     val currentCountryIndex: Int = 0,
     val currentCountry: String = "",

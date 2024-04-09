@@ -19,7 +19,6 @@ import com.example.geoquiz.data.SCORE_DECREASE
 import com.example.geoquiz.data.SCORE_INCREASE
 import com.example.geoquiz.model.Country
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
