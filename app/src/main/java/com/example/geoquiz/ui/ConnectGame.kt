@@ -39,7 +39,7 @@ fun ConnectGame(
     name: String,
     modifier: Modifier = Modifier,
     onConfirmButtonClicked: (Int) -> Unit,
-    viewModel: GeoQuizViewModel = viewModel(),
+    viewModel: GeoQuizViewModel = viewModel(factory = GeoQuizViewModel.Factory),
     highScoreViewModel: HighScoreViewModel = viewModel(factory = HighScoreViewModel.Factory)
 ) {
 
@@ -71,7 +71,7 @@ fun ConnectGame(
                     .weight(1f)
                     .align(Alignment.CenterVertically)
             ) {
-                for (i in viewModel.countries.indices) {
+                for (i in viewModel.countriesList.indices) {
                     Button(
                         onClick = { },
                         colors = ButtonDefaults.buttonColors(
@@ -88,7 +88,7 @@ fun ConnectGame(
                             .padding(dimensionResource(id = R.dimen.padding_small))
                     ) {
                         Text(
-                            text = viewModel.countries[i], modifier = Modifier.padding(
+                            text = viewModel.countriesList[i], modifier = Modifier.padding(
                                 dimensionResource(id = R.dimen.padding_small)
                             )
                         )

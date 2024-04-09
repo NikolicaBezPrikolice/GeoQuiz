@@ -1,6 +1,9 @@
 package com.example.geoquiz.ui
 
+import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -30,7 +34,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.geoquiz.R
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.geoquiz.data.DataSource
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -39,7 +45,7 @@ fun FlagGame(
     name: String,
     onConfirmButtonClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GeoQuizViewModel = viewModel(),
+    viewModel: GeoQuizViewModel = viewModel(factory = GeoQuizViewModel.Factory),
 ) {
     val flagGameUiState by viewModel.uiState.collectAsState()
 
@@ -66,14 +72,16 @@ fun FlagGame(
 }
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun PortraitFlagLayout(
     modifier: Modifier = Modifier,
-    viewModel: GeoQuizViewModel = viewModel(),
+    viewModel: GeoQuizViewModel,
 ) {
     val flagGameUiState by viewModel.uiState.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -91,20 +99,22 @@ fun PortraitFlagLayout(
                 textDecoration = TextDecoration.Underline
             )
         )
-        for (flagId in viewModel.flagIds) {
+        for (flagId in viewModel.flags) {
             val borderColor =
-                if (viewModel.clickedFlagId.value == flagId && flagId == DataSource.countryList[viewModel.getCountryIndex()].flagId) {
+                if (viewModel.clickedFlagId.value == flagId && flagId == viewModel.countries.value[viewModel.getCountryIndex()].flag.png) {
                     Color.Green
-                } else if (viewModel.clickedFlagId.value == flagId && flagId != DataSource.countryList[viewModel.getCountryIndex()].flagId) {
+                } else if (viewModel.clickedFlagId.value == flagId && flagId != viewModel.countries.value[viewModel.getCountryIndex()].flag.png) {
                     Color.Red
                 } else {
                     Color.Transparent
                 }
-            Image(
-                painterResource(id = flagId),
+            AsyncImage(
+                model = ImageRequest.Builder(context = LocalContext.current).data(flagId)
+                    .crossfade(true).build(),
+                placeholder = painterResource(R.drawable.loading_img),
+                error = painterResource(R.drawable.ic_broken_image),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(180.dp)
+                modifier = Modifier.size(180.dp)
                     .clickable {
                         coroutineScope.launch {
                             viewModel.updateClickedFlagId(flagId)
@@ -116,6 +126,7 @@ fun PortraitFlagLayout(
                     }
                     .border(2.dp, borderColor)
             )
+
         }
     }
 
@@ -125,7 +136,7 @@ fun PortraitFlagLayout(
 @Composable
 fun LandscapeFlagLayout(
     modifier: Modifier = Modifier,
-    viewModel: GeoQuizViewModel = viewModel(),
+    viewModel: GeoQuizViewModel,
 ) {
     val flagGameUiState by viewModel.uiState.collectAsState()
 
@@ -157,20 +168,22 @@ fun LandscapeFlagLayout(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ) {
-            for (flagId in viewModel.flagIds) {
+            for (flagId in viewModel.flags) {
                 val borderColor =
-                    if (viewModel.clickedFlagId.value == flagId && flagId == DataSource.countryList[viewModel.getCountryIndex()].flagId) {
+                    if (viewModel.clickedFlagId.value == flagId && flagId == viewModel.countries.value[viewModel.getCountryIndex()].flag.png) {
                         Color.Green
-                    } else if (viewModel.clickedFlagId.value == flagId && flagId != DataSource.countryList[viewModel.getCountryIndex()].flagId) {
+                    } else if (viewModel.clickedFlagId.value == flagId && flagId != viewModel.countries.value[viewModel.getCountryIndex()].flag.png) {
                         Color.Red
                     } else {
                         Color.Transparent
                     }
-                Image(
-                    painterResource(id = flagId),
+                AsyncImage(
+                    model = ImageRequest.Builder(context = LocalContext.current).data(flagId)
+                        .crossfade(true).build(),
+                    error = painterResource(R.drawable.ic_broken_image),
+                    placeholder = painterResource(R.drawable.loading_img),
                     contentDescription = null,
-                    modifier = Modifier
-                        .size(180.dp)
+                    modifier = Modifier.size(180.dp)
                         .clickable {
                             coroutineScope.launch {
                                 viewModel.updateClickedFlagId(flagId)
@@ -182,6 +195,7 @@ fun LandscapeFlagLayout(
                         }
                         .border(2.dp, borderColor)
                 )
+
             }
         }
     }

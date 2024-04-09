@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -27,11 +28,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.geoquiz.ui.ConnectGame
+import com.example.geoquiz.ui.ErrorScreen
 import com.example.geoquiz.ui.FlagGame
 import com.example.geoquiz.ui.GeoQuizViewModel
 import com.example.geoquiz.ui.MainMenu
 import com.example.geoquiz.ui.HighScoreViewModel
 import com.example.geoquiz.ui.HighScoresList
+import com.example.geoquiz.ui.LoadingScreen
+import com.example.geoquiz.ui.ScreenUiState
 
 
 enum class GeoQuizScreen(@StringRes val title: Int){
@@ -44,9 +48,9 @@ enum class GeoQuizScreen(@StringRes val title: Int){
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(),
+fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(factory = GeoQuizViewModel.Factory),
                highScoreViewModel: HighScoreViewModel= viewModel(factory = HighScoreViewModel.Factory),
-               navController: NavHostController = rememberNavController()
+               navController: NavHostController = rememberNavController(),
                ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen=GeoQuizScreen.valueOf(
@@ -58,20 +62,25 @@ fun GeoQuizApp(viewModel: GeoQuizViewModel = viewModel(),
         val uiState by viewModel.uiState.collectAsState()
         NavHost(navController = navController, startDestination = GeoQuizScreen.Menu.name, modifier = Modifier){
             composable(route=GeoQuizScreen.Menu.name){
-                MainMenu(
-                    nicknameInput = viewModel.nicknameInput,
-                    onNickNameInputChanged = {viewModel.updateNicknameInput(it)},
-                    onStartButtonClicked = {
-                        navController.navigate(GeoQuizScreen.Flags.name)},
-                    onHighScoresButtonClicked = {
-                        navController.navigate(GeoQuizScreen.HighScores.name)
-                    }
+
+                  MainMenu(
+                        nicknameInput = viewModel.nicknameInput,
+                        onNickNameInputChanged = {viewModel.updateNicknameInput(it)},
+                        onStartButtonClicked = {
+                            navController.navigate(GeoQuizScreen.Flags.name)},
+                        onHighScoresButtonClicked = {
+                            navController.navigate(GeoQuizScreen.HighScores.name)
+                        }
                     )
             }
             composable(route=GeoQuizScreen.Connect.name){
-                ConnectGame(score = uiState.score,name=viewModel.nicknameInput, onConfirmButtonClicked = {
-                    navController.navigate(GeoQuizScreen.Menu.name)
-                })
+                when (viewModel.screenUiState) {
+                    is ScreenUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxSize())
+                    is ScreenUiState.Success -> ConnectGame(score = uiState.score,name=viewModel.nicknameInput, onConfirmButtonClicked = {
+                        navController.navigate(GeoQuizScreen.Menu.name)
+                    })
+                    is ScreenUiState.Error -> ErrorScreen( modifier = Modifier.fillMaxSize())
+                }
             }
             composable(route=GeoQuizScreen.Flags.name){
                 FlagGame(name=viewModel.nicknameInput,onConfirmButtonClicked = {

@@ -1,21 +1,39 @@
 package com.example.geoquiz.ui
 
+import android.content.ContentValues
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.geoquiz.data.DataSource.countryList
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.geoquiz.GeoQuizApplication
+
+import com.example.geoquiz.data.GeoQuizRepository
 import com.example.geoquiz.data.MAX_NO_OF_COUNTRIES
 import com.example.geoquiz.data.SCORE_DECREASE
 import com.example.geoquiz.data.SCORE_INCREASE
 import com.example.geoquiz.model.Country
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-
-class GeoQuizViewModel : ViewModel() {
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
+sealed interface ScreenUiState {
+    object Success : ScreenUiState
+    object Error : ScreenUiState
+    object Loading : ScreenUiState
+}
+class GeoQuizViewModel(private val geoQuizRepository: GeoQuizRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(GeoQuizUiState())
     val uiState: StateFlow<GeoQuizUiState> = _uiState.asStateFlow()
 
@@ -25,15 +43,17 @@ class GeoQuizViewModel : ViewModel() {
     private lateinit var currentCountry: Country
     private var usedFlagsCountries: MutableSet<Country> = mutableSetOf()
     private var usedCapitalsCountries: MutableSet<Country> = mutableSetOf()
-    var flags: MutableList<Int> = mutableListOf()
-    val flagIds: List<Int> by lazy { getRandomFlags() }
-    var countries: MutableList<String> = mutableListOf()
+    var flags: MutableList<String> = mutableListOf()
+   //val flagIds: MutableList<String> by lazy { getRandomFlags() }
+    var countriesList: MutableList<String> = mutableListOf()
     var capitals: MutableList<String> = mutableListOf()
     val clickedButtonIndex: MutableMap<Int, Boolean> = mutableMapOf()
-    private val _clickedFlagId = mutableStateOf<Int?>(null)
-    val clickedFlagId: State<Int?> = _clickedFlagId
-
-    fun updateClickedFlagId(flagId: Int?) {
+    private val _clickedFlagId = mutableStateOf<String?>(null)
+    val clickedFlagId: State<String?> = _clickedFlagId
+    var screenUiState: ScreenUiState by mutableStateOf(ScreenUiState.Loading)
+    private val _countries = mutableStateOf<List<Country>>(emptyList())
+    val countries: State<List<Country>> = _countries
+    fun updateClickedFlagId(flagId: String?) {
         _clickedFlagId.value = flagId
     }
     fun updateNicknameInput(input: String) {
@@ -41,9 +61,31 @@ class GeoQuizViewModel : ViewModel() {
     }
 
     init {
-        initializeMap()
-        resetGame()
-        getRandomCountriesAndCapitals()
+        viewModelScope.launch {
+            getCountries()
+            initializeMap()
+            resetGame()
+            getRandomCountriesAndCapitals()
+            getRandomFlags()
+        }
+    }
+
+    suspend fun getCountries() {
+        screenUiState = ScreenUiState.Loading
+        withContext(Dispatchers.IO) {
+                screenUiState = try {
+                    _countries.value = geoQuizRepository.getCountries()
+                    Log.e(
+                        ContentValues.TAG,
+                        "Koliko: ${_countries.value.size}::: ${countries.value.size}"
+                    )
+                    ScreenUiState.Success
+                } catch (e: IOException) {
+                    ScreenUiState.Error
+                } catch (e: HttpException) {
+                    ScreenUiState.Error
+                }
+        }
     }
 
     fun resetGame() {
@@ -51,9 +93,9 @@ class GeoQuizViewModel : ViewModel() {
         usedCapitalsCountries.clear()
         val newCountry = pickRandomCountry(usedFlagsCountries,0)
         _uiState.value = GeoQuizUiState(
-            currentCountry = newCountry.name,
-            currentCountryIndex = countryList.indexOfFirst { it == newCountry },
-            flag = countryList.first { it == newCountry }.flagId,
+            currentCountry = newCountry.name.common,
+            currentCountryIndex = countries.value.indexOfFirst { it == newCountry },
+            flag = countries.value.first { it == newCountry }.flag.png,
             isGameOver = false,
         )
     }
@@ -70,18 +112,18 @@ class GeoQuizViewModel : ViewModel() {
             val newCountry = pickRandomCountry(usedFlagsCountries,0)
             _uiState.update { currentState ->
                 currentState.copy(
-                    currentCountry = newCountry.name,
-                    currentCountryIndex = countryList.indexOfFirst { it == newCountry },
-                    flag = countryList.first { it == newCountry }.flagId,
+                    currentCountry = newCountry.name.common,
+                    currentCountryIndex = countries.value.indexOfFirst { it == newCountry },
+                    flag = countries.value.first { it == newCountry }.flag.png,
                     score = updatedScore
                 )
             }
         }
     }
 
-    fun checkImageClicked(clickedFlagId: Int) {
+    fun checkImageClicked(clickedFlagId: String) {
 
-        if (clickedFlagId == countryList[getCountryIndex()].flagId) {
+        if (clickedFlagId == countries.value[getCountryIndex()].flag.png) {
             val updatedScore = _uiState.value.score.plus(SCORE_INCREASE)
             updateGameState(updatedScore)
         } else {
@@ -93,7 +135,7 @@ class GeoQuizViewModel : ViewModel() {
 
     private fun pickRandomCountry(usedCountries: MutableSet<Country>,game: Int): Country {
         if(game==0) {
-            currentCountry = countryList.random()
+            currentCountry = countries.value.random()
             return if (usedCountries.contains(currentCountry)) {
                 pickRandomCountry(usedCountries,0)
             } else {
@@ -102,7 +144,7 @@ class GeoQuizViewModel : ViewModel() {
             }
         }
         else{
-            val country= countryList.random()
+            val country= countries.value.random()
             return if (usedCountries.contains(country)) {
                 pickRandomCountry(usedCountries,1)
             } else {
@@ -113,14 +155,14 @@ class GeoQuizViewModel : ViewModel() {
     }
 
     fun getCountryIndex(): Int {
-        return countryList.indexOfFirst { it == currentCountry }
+        return countries.value.indexOfFirst { it == currentCountry }
     }
 
 
-    fun getRandomFlags(): MutableList<Int> {
+    fun getRandomFlags(): MutableList<String> {
         flags.clear()
         flags.add(uiState.value.flag)
-        val filteredFlags = countryList.filter { it.flagId != uiState.value.flag }.map { it.flagId }
+        val filteredFlags = countries.value.filter { it.flag.png != uiState.value.flag }.map { it.flag.png }
         val randomFlags = filteredFlags.shuffled().take(2)
         flags.addAll(randomFlags)
         flags.shuffle()
@@ -128,20 +170,20 @@ class GeoQuizViewModel : ViewModel() {
     }
 
     fun getRandomCountriesAndCapitals() {
-        countries.clear()
+        countriesList.clear()
         capitals.clear()
         for (i in 0 until MAX_NO_OF_COUNTRIES) {
             val country = pickRandomCountry(usedCapitalsCountries,1)
-            countries.add(country.name)
-            capitals.add(country.capital)
+            countriesList.add(country.name.common)
+            capitals.add(country.capital?.get(0) ?: "/")
         }
-        countries.shuffle()
+        countriesList.shuffle()
         capitals.shuffle()
     }
 
     fun checkCapitalClicked(capital: String, button: Int) {
-        currentCountry = countryList.find { it.name == countries[uiState.value.countryCount] }!!
-        if (capital == currentCountry.capital) {
+        currentCountry = countries.value.find { it.name.common == countriesList[uiState.value.countryCount] }!!
+        if (capital == (currentCountry.capital?.getOrNull(0) ?: "/")) {
             val updatedScore = _uiState.value.score.plus(SCORE_INCREASE)
             clickedButtonIndex[button] = true
             clickedButtonIndex[uiState.value.countryCount] = true
@@ -186,6 +228,16 @@ class GeoQuizViewModel : ViewModel() {
             )
         }
     }
+    companion object{
+        val Factory: ViewModelProvider.Factory= viewModelFactory{
+            initializer {
+                val application=(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as GeoQuizApplication)
+                val geoQuizRepository=application.container.geoQuizRepository
+                GeoQuizViewModel(geoQuizRepository = geoQuizRepository)
+            }
+        }
+    }
+
 
 
 }
