@@ -33,23 +33,25 @@ import com.example.geoquiz.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun HighScoresList(highScores: List<HighScore>,
-                   onClickButton: ()->(Unit),
-                   highScoreViewModel: HighScoreViewModel= viewModel(factory = HighScoreViewModel.Factory),
-                   ) {
+fun HighScoresList(
+    highScores: List<HighScore>,
+    onClickButton: () -> (Unit),
+    highScoreViewModel: HighScoreViewModel = viewModel(factory = HighScoreViewModel.Factory),
+) {
     var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-    val coroutineScope= rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     Column(modifier = Modifier.padding(top = 80.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(
-                onClick = { deleteConfirmationRequired = true
+                onClick = {
+                    deleteConfirmationRequired = true
                 },
                 modifier = Modifier
                     .padding(end = 16.dp, bottom = 16.dp)
-                ) {
+            ) {
                 Text(stringResource(id = R.string.delete_scores))
             }
             Button(
@@ -60,7 +62,7 @@ fun HighScoresList(highScores: List<HighScore>,
                 Text(stringResource(id = R.string.back_to_main_menu))
             }
         }
-        LazyColumn(modifier = Modifier.padding(top=10.dp)) {
+        LazyColumn(modifier = Modifier.padding(top = 10.dp)) {
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -100,8 +102,8 @@ fun HighScoresList(highScores: List<HighScore>,
                 )
             }
             items(highScores.size) { index ->
-                val score=highScores[index]
-                HighScoreItem(position = index+1, score=score)
+                val score = highScores[index]
+                HighScoreItem(position = index + 1, score = score)
                 Divider(
                     color = Color.White,
                     thickness = 1.dp,
@@ -109,14 +111,18 @@ fun HighScoresList(highScores: List<HighScore>,
                 )
             }
         }
-        if(deleteConfirmationRequired){
+        if (deleteConfirmationRequired) {
             DeleteDialog(
-                onConfirmButtonClicked = {deleteConfirmationRequired = false
+                onConfirmButtonClicked = {
+                    deleteConfirmationRequired = false
                     coroutineScope.launch {
                         highScoreViewModel.deleteAllItems()
-                    } },
-                onDeleteButtonClicked = { deleteConfirmationRequired = false
-                   })
+                    }
+                },
+                onDeleteButtonClicked = {
+                    deleteConfirmationRequired = false
+                }
+            )
         }
     }
 }
@@ -134,9 +140,10 @@ fun HighScoreItem(position: Int, score: HighScore) {
         Text(
             text = "$position.",
         )
-        Text(text = score.name,
+        Text(
+            text = score.name,
             Modifier.width(70.dp)
-            )
+        )
         Text(text = score.score.toString())
 
     }
@@ -145,7 +152,7 @@ fun HighScoreItem(position: Int, score: HighScore) {
 @Composable
 private fun DeleteDialog(
     onConfirmButtonClicked: () -> (Unit),
-    onDeleteButtonClicked:()->(Unit),
+    onDeleteButtonClicked: () -> (Unit),
     modifier: Modifier = Modifier
 ) {
 

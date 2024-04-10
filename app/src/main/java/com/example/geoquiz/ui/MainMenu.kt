@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -25,21 +24,6 @@ import androidx.compose.ui.unit.dp
 import com.example.geoquiz.R
 
 
-/**
- * The home screen displaying the loading message.
- */
-@Composable
-fun LoadingScreen(modifier: Modifier = Modifier) {
-    Image(
-        modifier = modifier.size(200.dp),
-        painter = painterResource(R.drawable.loading_img),
-        contentDescription = stringResource(R.string.app_name)
-    )
-}
-
-/**
- * The home screen displaying error message with re-attempt button.
- */
 @Composable
 fun ErrorScreen(modifier: Modifier = Modifier) {
     Column(
@@ -48,18 +32,21 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
+            painter = painterResource(id = R.drawable.ic_connection_error),
+            contentDescription = "connection error"
         )
-        Text(text = stringResource(R.string.app_name), modifier = Modifier.padding(16.dp))
+        Text(text = stringResource(R.string.no_internet), modifier = Modifier.padding(16.dp))
     }
 }
+
 @Composable
 fun MainMenu(
     nicknameInput: String,
-    onNickNameInputChanged:(String)->Unit,
+    onNickNameInputChanged: (String) -> Unit,
     onStartButtonClicked: (String) -> Unit,
-    onHighScoresButtonClicked: ()->Unit,
-    modifier: Modifier = Modifier) {
+    onHighScoresButtonClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -91,7 +78,7 @@ fun MainMenu(
             Spacer(modifier = Modifier.padding(20.dp))
             Button(
                 onClick = {
-                   onStartButtonClicked(nicknameInput)
+                    onStartButtonClicked(nicknameInput)
                 },
                 enabled = nicknameInput.isNotBlank()
             ) {
@@ -114,7 +101,6 @@ fun MainMenu(
                     bottom = 16.dp, end = 16.dp
                 )
             )
-
         }
     }
 }

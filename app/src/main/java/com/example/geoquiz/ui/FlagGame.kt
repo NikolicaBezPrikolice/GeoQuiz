@@ -111,7 +111,8 @@ fun PortraitFlagLayout(
                 placeholder = painterResource(R.drawable.loading_img),
                 error = painterResource(R.drawable.ic_broken_image),
                 contentDescription = null,
-                modifier = Modifier.size(180.dp)
+                modifier = Modifier
+                    .size(180.dp)
                     .clickable {
                         coroutineScope.launch {
                             viewModel.updateClickedFlagId(flagId)
@@ -123,11 +124,8 @@ fun PortraitFlagLayout(
                     }
                     .border(2.dp, borderColor)
             )
-
         }
     }
-
-
 }
 
 @Composable
@@ -180,7 +178,8 @@ fun LandscapeFlagLayout(
                     error = painterResource(R.drawable.ic_broken_image),
                     placeholder = painterResource(R.drawable.loading_img),
                     contentDescription = null,
-                    modifier = Modifier.size(180.dp)
+                    modifier = Modifier
+                        .size(180.dp)
                         .clickable {
                             coroutineScope.launch {
                                 viewModel.updateClickedFlagId(flagId)
@@ -192,11 +191,9 @@ fun LandscapeFlagLayout(
                         }
                         .border(2.dp, borderColor)
                 )
-
             }
         }
     }
-
 }
 
 
@@ -211,8 +208,8 @@ private fun FinalScoreDialog(
     AlertDialog(
         onDismissRequest = {
         },
-        title = { Text(text = stringResource(id = R.string.nickname)+":  "+ nickname) },
-        text = { Text(text = stringResource(id = R.string.score)+":  "+score.toString()) },
+        title = { Text(text = stringResource(id = R.string.nickname) + ":  " + nickname) },
+        text = { Text(text = stringResource(id = R.string.score) + ":  " + score.toString()) },
         modifier = modifier,
         confirmButton = {
             TextButton(onClick = { onConfirmButtonClicked(score) }) {
