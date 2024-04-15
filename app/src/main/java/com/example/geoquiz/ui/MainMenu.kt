@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -25,7 +26,10 @@ import com.example.geoquiz.R
 
 
 @Composable
-fun ErrorScreen(modifier: Modifier = Modifier) {
+fun ErrorScreen(
+    retryAction: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
@@ -36,7 +40,19 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
             contentDescription = "connection error"
         )
         Text(text = stringResource(R.string.no_internet), modifier = Modifier.padding(16.dp))
+        Button(onClick = retryAction) {
+            Text(stringResource(R.string.retry))
+        }
     }
+}
+
+@Composable
+fun LoadingScreen(modifier: Modifier = Modifier) {
+    Image(
+        modifier = modifier.size(200.dp),
+        painter = painterResource(R.drawable.loading_img),
+        contentDescription = stringResource(R.string.loading)
+    )
 }
 
 @Composable
@@ -47,7 +63,6 @@ fun MainMenu(
     onHighScoresButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter

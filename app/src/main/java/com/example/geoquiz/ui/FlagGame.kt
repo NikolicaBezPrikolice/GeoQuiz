@@ -30,10 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.geoquiz.R
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -42,7 +40,7 @@ fun FlagGame(
     name: String,
     onConfirmButtonClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GeoQuizViewModel = viewModel(factory = GeoQuizViewModel.Factory),
+    viewModel: GeoQuizViewModel,
 ) {
     val flagGameUiState by viewModel.uiState.collectAsState()
 
@@ -59,7 +57,7 @@ fun FlagGame(
             viewModel = viewModel
         )
     }
-    if (flagGameUiState.isGameOver) {
+    if (flagGameUiState.isGame1Over) {
         FinalScoreDialog(
             nickname = name,
             score = flagGameUiState.score,
@@ -67,7 +65,6 @@ fun FlagGame(
         )
     }
 }
-
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -196,12 +193,11 @@ fun LandscapeFlagLayout(
     }
 }
 
-
 @Composable
 private fun FinalScoreDialog(
     nickname: String,
     score: Int,
-    onConfirmButtonClicked: (Int) -> (Unit),
+    onConfirmButtonClicked: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
 

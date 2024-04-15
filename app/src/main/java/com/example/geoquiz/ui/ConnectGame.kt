@@ -39,7 +39,7 @@ fun ConnectGame(
     name: String,
     modifier: Modifier = Modifier,
     onConfirmButtonClicked: (Int) -> Unit,
-    viewModel: GeoQuizViewModel = viewModel(factory = GeoQuizViewModel.Factory),
+    viewModel: GeoQuizViewModel,
     highScoreViewModel: HighScoreViewModel = viewModel(factory = HighScoreViewModel.Factory)
 ) {
 
@@ -125,25 +125,25 @@ fun ConnectGame(
             }
         }
     }
-    if (connectGameUiState.isGameOver) {
+    if (connectGameUiState.isGame2Over) {
         highScoreViewModel.getScore(name)
         FinalScoreDialog(
-            score = score + connectGameUiState.score,
+            score = score,
             nickname = name,
             onConfirmButtonClicked = {
-                onConfirmButtonClicked.invoke(score + connectGameUiState.score)
+                onConfirmButtonClicked.invoke(score)
                 if (highScoreUiState != null) {
                     coroutineScope.launch {
                         withContext(Dispatchers.IO) {
                             highScoreViewModel.updateOneScore(
                                 highScoreUiState!!,
-                                score + connectGameUiState.score
+                                score
                             )
                         }
                     }
                 } else {
                     coroutineScope.launch {
-                        highScoreViewModel.saveHighScore(name, score + connectGameUiState.score)
+                        highScoreViewModel.saveHighScore(name, score)
                     }
                 }
             }
