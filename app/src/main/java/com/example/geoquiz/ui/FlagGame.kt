@@ -28,6 +28,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.geoquiz.R
 import coil.compose.AsyncImage
@@ -91,7 +92,9 @@ fun PortraitFlagLayout(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
             style = MaterialTheme.typography.displayLarge.copy(
                 textDecoration = TextDecoration.Underline
-            )
+            ) ,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1
         )
         for (flagId in viewModel.flags) {
             val borderColor =
@@ -153,7 +156,9 @@ fun LandscapeFlagLayout(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
                 style = MaterialTheme.typography.displayLarge.copy(
                     textDecoration = TextDecoration.Underline
-                )
+                ),
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
             )
         }
         Row(

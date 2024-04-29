@@ -77,7 +77,12 @@ fun ConnectGame(
                         colors = ButtonDefaults.buttonColors(
                             when {
                                 viewModel.clickedButtonIndex[i] == true -> Color.Green
-                                connectGameUiState.countryCount == i -> Color.Yellow
+                                connectGameUiState.countryCount == i -> Color(
+                                    red = 219,
+                                    green = 202,
+                                    blue = 47,
+                                    alpha = 255
+                                )
 
                                 viewModel.clickedButtonIndex[i] == false && i > connectGameUiState.countryCount -> MaterialTheme.colorScheme.primary
                                 else -> Color.Red
